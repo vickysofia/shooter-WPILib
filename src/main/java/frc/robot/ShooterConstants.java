@@ -1,8 +1,5 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
+
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
@@ -16,7 +13,7 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue;
  * constants are needed, to reduce verbosity.
  */
 public final class ShooterConstants {
-  public static class OperatorConstants {
+
     public static final int LEADER_ID = 0;
     public static final int FOLLOWER_ID = 0;
 
@@ -31,20 +28,16 @@ public final class ShooterConstants {
     public static final MotorAlignmentValue ALIGNMENT = MotorAlignmentValue.Aligned; //  going same direction
 
 
-    public static final String canBusName = "canbus";
+    public static final String canBusName = "daniel";
+    public static double HOODKp = 0.0;
+    public static double HOODKi = 0.0;
+    public static double HOODKd = 0.0;
     
-    
-
-    //flywheel alignment
-    //flywheel speed RPS
-    //hood gear ratio
-    //hood rotation
-
-    //hood kp
 
 
 
 
 
-  }
+
+  
 }
