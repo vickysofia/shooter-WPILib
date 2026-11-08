@@ -7,6 +7,7 @@ import static frc.robot.ShooterConstants.*;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -21,19 +22,22 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ShooterSubsystem extends SubsystemBase {//shoud it extend systembase
 
-    final TalonFX leader = new TalonFX(LEADER_ID, canBusName);
+    final CANBus canBus = new CANBus(canBusName);
+    final TalonFX leader = new TalonFX(LEADER_ID, canBus);
     final TalonFX follower = new TalonFX(FOLLOWER_ID, canBusName);
     final TalonFX hood = new TalonFX(HOOD_ID, canBusName);
-    final CANBus canBus = new CANBus(canBusName);
-    final VelocityVoltage velocity = new VelocityVoltage(0);
-    BangBangController controller = new BangBangController();
-    final CANcoder hoodEncoder = new CANcoder(HOOD_ENCODERid);
+
+    BangBangController controller = new BangBangController(); //flywheel
+    final DutyCycleOut flywheelDutyCycleOut = new DutyCycleOut(0);
+    final PositionVoltage hoodPosition = new PositionVoltage(0);
+    final CANcoder hoodEncoder = new CANcoder(HOOD_ENCODERid, canBusName);
+
 
    // var slot0Configs = new Slot0Configs();
 
@@ -49,9 +53,9 @@ public class ShooterSubsystem extends SubsystemBase {//shoud it extend systembas
      TalonFXConfiguration hoodConfig = new TalonFXConfiguration();
        hoodConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
        hoodConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
-       hoodConfig.Feedback.FeedbackRemoteSensorID = HOOD_ID;
-       hoodConfig.Feedback.RotorToSensorRatio = -GEAR_RATIO;//encoder data to rotations
-       hoodConfig.Feedback.SensorToMechanismRatio = -1.0;
+       hoodConfig.Feedback.FeedbackRemoteSensorID = HOOD_ENCODERid;
+       hoodConfig.Feedback.RotorToSensorRatio = GEAR_RATIO;//encoder data to rotations
+       hoodConfig.Feedback.SensorToMechanismRatio = 1.0;
 
        hoodConfig.Slot0.kP = HOODKp;
        hoodConfig.Slot0.kI = HOODKi;
@@ -65,8 +69,23 @@ public class ShooterSubsystem extends SubsystemBase {//shoud it extend systembas
 
    }
 
-   public Command flywheelSpin(){
+   public void flywheelSpin(){
+    double currSpeed = leader.getVelocity().getValueAsDouble();
+    double bangbangOutput = controller.calculate(currSpeed, FLYWHEEL_SPEED);
+    leader.setControl(flywheelDutyCycleOut.withOutput(bangbangOutput));
 
+
+    //leader.setControl(flywheelDutyCycleOut.withOutput(controller.calculate(leader.getVelocity().getValueAsDouble(), FLYWHEEL_SPEED)));
+
+   }
+   public void flywheelStop(){
+
+    leader.setControl(flywheelDutyCycleOut.withOutput(0));
+   }
+   public Command flywheelSpinCommand(){
+    return runEnd(this::flywheelSpin, this::flywheelStop);
+    //command that runs every 20ms
+    //runs spin while actice and stop otherwise
    }
 
 
@@ -118,23 +137,3 @@ public class ShooterSubsystem extends SubsystemBase {//shoud it extend systembas
 // //talonFX_FOLLOWER.configFactoryDefault(); auto configs to leaders settings i think
 
 // m_talonFX.setControl(m_talonFXOut);
-
-
-// // robot init, set m_follower to follow m_leader
-// talonFX_FOLLOWER.follow(talonFX_LEADER);
-// // m_follower should NOT oppose m_leader
-// talonFX_FOLLOWER.setInverted(TalonFXInvertType.FollowMaster);
-// // set m_strictFollower to follow m_leader
-// m_strictFollower.follow(talonFX_LEADER);
-// // set m_strictFollower to ignore m_leader invert and use its own
-// m_strictFollower.setInverted(TalonFXInvertType.CounterClockwise);
-
-// // main robot code, command 100% output for m_leader
-// m_leader.set(ControlMode.PercentOutput, 1.0);
-// // - m_follower and m_strictFollower will also run at 100% output
-// // - m_follower will follow m_leader's invert, while m_strictFollower
-// //   ignores it and uses its own
-// // NOTE: if set(), neutralOutput(), or disable() is ever called on
-// //       the followers, they will stop following
-
-

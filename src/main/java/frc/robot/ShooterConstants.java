@@ -16,12 +16,13 @@ public final class ShooterConstants {
 
     public static final int LEADER_ID = 0;
     public static final int FOLLOWER_ID = 0;
+    public static final double FLYWHEEL_SPEED = 0.0;
 
 
     public static final int HOOD_ID = 0;
     public static final int HOOD_ENCODERid =0;
-    public static double GEAR_RATIO = 0.0; //idk how to calculate it
-    public static double ROTATION = 0.0;//for hood
+    public static final double GEAR_RATIO = 0.0; //idk how to calculate it
+    public static final double ROTATION = 0.0;//for hood
 
 
     public static final InvertedValue FLYWHEEL_INVERTED = InvertedValue.Clockwise_Positive; //or CCW+
@@ -29,9 +30,9 @@ public final class ShooterConstants {
 
 
     public static final String canBusName = "daniel";
-    public static double HOODKp = 0.0;
-    public static double HOODKi = 0.0;
-    public static double HOODKd = 0.0;
+    public static final double HOODKp = 0.0;
+    public static final double HOODKi = 0.0;
+    public static final double HOODKd = 0.0;
     
 
 

@@ -6,12 +6,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 
 
 import frc.robot.subsystems.ShooterSubsystem;
-
-
-import frc.robot.subsystems.ShooterSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+
+
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 
@@ -21,7 +18,7 @@ public class RobotContainer {
        CommandPS5Controller controller = new CommandPS5Controller(0);
 
       public RobotContainer(){
-       controller.R2().whileTrue(shooter.flywheelSpin());    // hold R2: spin flywheel
+       controller.R2().whileTrue(shooter.flywheelSpinCommand());    // hold R2: spin flywheel
        controller.cross().onTrue(shooter.hoodMovement());    // press X: hood to shooting angle
   }
 
