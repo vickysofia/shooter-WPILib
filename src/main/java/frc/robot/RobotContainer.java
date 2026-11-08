@@ -1,15 +1,15 @@
 
 package frc.robot;
-import static frc.robot.ShooterConstants.*;
+//import static frc.robot.ShooterConstants.*;
 
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 
 
 import frc.robot.subsystems.ShooterSubsystem;
-import edu.wpi.first.wpilibj2.command.Command;
+//import edu.wpi.first.wpilibj2.command.Command;
 
 
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+//import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 
 public class RobotContainer {
@@ -18,8 +18,10 @@ public class RobotContainer {
        CommandPS5Controller controller = new CommandPS5Controller(0);
 
       public RobotContainer(){
-       controller.R2().whileTrue(shooter.flywheelSpinCommand());    // hold R2: spin flywheel
-       controller.cross().onTrue(shooter.hoodMovement());    // press X: hood to shooting angle
+        
+       controller.R2().whileTrue(shooter.flywheelSpinCommand());//hold r2 spin flywheel
+
+       controller.cross().onTrue(shooter.hoodMovementCommand());//press x to move hood
   }
 
 

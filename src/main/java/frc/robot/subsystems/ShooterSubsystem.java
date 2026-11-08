@@ -10,8 +10,8 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
-import com.ctre.phoenix6.controls.VelocityVoltage;
-import com.ctre.phoenix6.controls.VoltageOut;
+// import com.ctre.phoenix6.controls.VelocityVoltage;
+// import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
@@ -26,17 +26,19 @@ import edu.wpi.first.wpilibj2.command.Commands;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class ShooterSubsystem extends SubsystemBase {//shoud it extend systembase
+public class ShooterSubsystem extends SubsystemBase {
 
     final CANBus canBus = new CANBus(canBusName);
     final TalonFX leader = new TalonFX(LEADER_ID, canBus);
-    final TalonFX follower = new TalonFX(FOLLOWER_ID, canBusName);
-    final TalonFX hood = new TalonFX(HOOD_ID, canBusName);
+    final TalonFX follower = new TalonFX(FOLLOWER_ID, canBus);
+    final TalonFX hood = new TalonFX(HOOD_ID, canBus);
 
-    BangBangController controller = new BangBangController(); //flywheel
+    final BangBangController controller = new BangBangController(); //flywheel
     final DutyCycleOut flywheelDutyCycleOut = new DutyCycleOut(0);
+
+
     final PositionVoltage hoodPosition = new PositionVoltage(0);
-    final CANcoder hoodEncoder = new CANcoder(HOOD_ENCODERid, canBusName);
+    final CANcoder hoodEncoder = new CANcoder(HOOD_ENCODERid, canBus);
 
 
    // var slot0Configs = new Slot0Configs();
@@ -52,44 +54,56 @@ public class ShooterSubsystem extends SubsystemBase {//shoud it extend systembas
 
      TalonFXConfiguration hoodConfig = new TalonFXConfiguration();
        hoodConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-       hoodConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+       hoodConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder; //where it is
        hoodConfig.Feedback.FeedbackRemoteSensorID = HOOD_ENCODERid;
-       hoodConfig.Feedback.RotorToSensorRatio = GEAR_RATIO;//encoder data to rotations
-       hoodConfig.Feedback.SensorToMechanismRatio = 1.0;
+       //hoodConfig.Feedback.RotorToSensorRatio = GEAR_RATIO;//encoder data to rotations
+       hoodConfig.Feedback.SensorToMechanismRatio = 1.0; //cancoder rotations per hood rot
 
+        //PID
        hoodConfig.Slot0.kP = HOODKp;
        hoodConfig.Slot0.kI = HOODKi;
        hoodConfig.Slot0.kD = HOODKd;
-       hood.getConfigurator().apply(hoodConfig);
+       hood.getConfigurator().apply(hoodConfig); //apply gains
 
    }
 
-   public Command hoodMovement(){
-    
+   public void hoodMovement(){
+    hood.setControl(hoodPosition.withPosition(ROTATION)); 
+   }
+
+   public Command hoodMovementCommand(){
+    return Commands.runOnce(this::hoodMovement);
 
    }
 
    public void flywheelSpin(){
-    double currSpeed = leader.getVelocity().getValueAsDouble();
-    double bangbangOutput = controller.calculate(currSpeed, FLYWHEEL_SPEED);
-    leader.setControl(flywheelDutyCycleOut.withOutput(bangbangOutput));
+    double currSpeed = leader.getVelocity().getValueAsDouble(); //currentspped to adjust if its too low 
+    double bangbangOutput = controller.calculate(currSpeed, FLYWHEEL_SPEED);//bangbang calculates how much to make up for deficit
+    leader.setControl(flywheelDutyCycleOut.withOutput(bangbangOutput)); //adjusts
 
 
     //leader.setControl(flywheelDutyCycleOut.withOutput(controller.calculate(leader.getVelocity().getValueAsDouble(), FLYWHEEL_SPEED)));
 
    }
-   public void flywheelStop(){
 
+   public void flywheelStop(){
     leader.setControl(flywheelDutyCycleOut.withOutput(0));
    }
+
    public Command flywheelSpinCommand(){
     return runEnd(this::flywheelSpin, this::flywheelStop);
     //command that runs every 20ms
-    //runs spin while actice and stop otherwise
+    //runs flywheelspin while actice and stop otherwise
    }
 
 
 }
+
+
+//IGNORE below (for myself to reference)
+
+
+
 // // robot init, set slot 0 gains
 //     var configs = new TalonFXConfiguration();
 //     configs.Slot0.kV = KV;
