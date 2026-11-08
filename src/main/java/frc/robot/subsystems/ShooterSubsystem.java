@@ -56,7 +56,7 @@ public class ShooterSubsystem extends SubsystemBase {
        hoodConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
        hoodConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder; //where it is
        hoodConfig.Feedback.FeedbackRemoteSensorID = HOOD_ENCODERid;
-       //hoodConfig.Feedback.RotorToSensorRatio = GEAR_RATIO;//encoder data to rotations
+       //hoodConfig.Feedback.RotorToSensorRatio = GEAR_RATIO;//encoder data to rotations not necessary bc encoder does it?
        hoodConfig.Feedback.SensorToMechanismRatio = 1.0; //cancoder rotations per hood rot
 
         //PID
